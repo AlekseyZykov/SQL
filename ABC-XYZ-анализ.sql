@@ -1,3 +1,16 @@
+/* 
+PostgreSQL 16
+Данный запрос предназначен для ABC-XYZ анализа ассортимента региональной аптечной сети. 
+Таблица sales содержит агрегированную информацию о продажах.
+Описание стобцов:
+dr_ndrugs - наименование товара
+dr_kol - кол-во проданного товара в данной строке чека
+dr_dat - дата чека
+dr_croz - розничная цена
+dr_czak - закупочная цена
+dr_sdisc - сумма скидки на всю строку чека 
+ */
+--Для XYZ-анализа агрегируем по товарам кол-во проданных штук в недельном разрезе 
 with agg_xyz as (
 select 	
 	dr_ndrugs as product,	
@@ -8,6 +21,7 @@ from
 group by
 	product, week
 ),
+--Для ABC-анализа агрегируем по товарам кол-во проданных штук, выручку и прибыль
 agg_abc as (
 select 
 	dr_ndrugs as product, sum(dr_kol) as cnt, 
@@ -18,6 +32,7 @@ from
 group by 
 	product
 ),
+--Для ABC-анализа присваиваем соответсвующую группу
 abc as (
 select 
 	product, 
@@ -39,6 +54,7 @@ select
 from
 	agg_abc
 ),
+--Для XYZ-анализа присваиваем соответсвующую группу. Если товар продавался менее 4-х недель, тогда без группы, т.е. NULL
 xyz as (
 select 
 	product, 
@@ -53,6 +69,7 @@ from
 group by
 	product
 )
+--Соединяем анализы и выводим результат
 select 
 	a.product, a.amount_abc, a.profit_abc, a.revenue_abc, x.xyz_sales
 from
