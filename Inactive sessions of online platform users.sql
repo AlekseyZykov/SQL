@@ -12,27 +12,19 @@ PostgreSQL 16
 Когда человек стартует тест, делается запись в таблицу TestStart.
 */
 with activities as (
-    select
-        user_id,
-        date(created_at) as dt
-    from
-        coderun c
+    select user_id, date(created_at) as dt
+    from coderun c
     union
-    select
-        user_id,
-        date(created_at) as dt
-    from
-        codesubmit c2
+    select user_id, date(created_at) as dt
+    from codesubmit c2
     union
-    select
-        user_id,
-        date(created_at) as dt
-    from
-        teststart
+    select user_id, date(created_at) as dt
+    from teststart
 ),
-cnt_none_active as (select count(u.user_id) as cnt_none_active
-from userentry u 
-where not exists (select * from activities a where u.user_id = a.user_id and u.entry_at::date = a.dt)
+cnt_none_active as (
+	select count(u.user_id) as cnt_none_active
+	from userentry u 
+	where not exists (select * from activities a where u.user_id = a.user_id and u.entry_at::date = a.dt)
 ),
 entry_users as (
 	select count(user_id) as entry
