@@ -23,3 +23,4 @@ Round(avg(active_users) over (order by date rows between unbounded preceding and
 	where a.date <= agg.date
 ) as sliding_median
 from agg
+order by date
